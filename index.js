@@ -1,6 +1,8 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 const scoreEl = document.querySelector("#scoreEl");
+const startGameBtn = document.querySelector("#startGameBtn");
+const modalEl = document.querySelector("#modalEl");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -217,5 +219,8 @@ window.addEventListener("click", (event) => {
   );
 });
 
-animate();
-spawnEnemies();
+startGameBtn.addEventListener("click", () => {
+  animate();
+  spawnEnemies();
+  modalEl.style.display = "none";
+});

@@ -1,5 +1,6 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
+const scoreEl = document.querySelector("#scoreEl");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -61,6 +62,8 @@ class Enemy {
   }
 }
 
+const friction = 0.99;
+
 class Particle {
   constructor(x, y, radius, color, velocity) {
     this.x = x;
@@ -81,6 +84,8 @@ class Particle {
   }
   update() {
     this.draw();
+    this.velocity.x *= friction;
+    this.velocity.y *= friction;
     this.x = this.x + this.velocity.x;
     this.y = this.y + this.velocity.y;
     this.alpha -= 0.01;
@@ -121,6 +126,7 @@ function spawnEnemies() {
 }
 
 let animationId;
+let score = 0;
 
 function animate() {
   animationId = requestAnimationFrame(animate);
@@ -159,15 +165,24 @@ function animate() {
       // When projectiles touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
         //Collision Explosion
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < enemy.radius * 2; i++) {
           particles.push(
-            new Particle(projectile.x, projectile.y, 3, enemy.color, {
-              x: Math.random() - 0.5,
-              y: Math.random() - 0.5,
-            })
+            new Particle(
+              projectile.x,
+              projectile.y,
+              Math.random() * 2,
+              enemy.color,
+              {
+                x: (Math.random() - 0.5) * (Math.random() * 6),
+                y: (Math.random() - 0.5) * (Math.random() * 6),
+              }
+            )
           );
         }
         if (enemy.radius - 10 > 5) {
+          // Increase score
+          score += 100;
+          scoreEl.innerHTML = score;
           gsap.to(enemy, {
             radius: enemy.radius - 10,
           });
@@ -175,6 +190,9 @@ function animate() {
             projectiles.splice(projectileIndex, 1);
           }, 0);
         } else {
+          // remove all together
+          score += 250;
+          scoreEl.innerHTML = score;
           setTimeout(() => {
             enemies.splice(index, 1);
             projectiles.splice(projectileIndex, 1);
